@@ -9,6 +9,8 @@ var java = require('java');
 java.classpath.push("");
 var lexto = java.import('LongLexTo');
 
+var pythonShell = require('python-shell');
+
 var restful = require('node-restful');
 var mongoose = restful.mongoose
 mongoose.connect('mongodb://localhost:27017/boom_test');
@@ -37,10 +39,28 @@ app.post('/lexto', function(req, res) {
 	var output = lexto.word_segmentationSync(req.body.sentence);	
 	console.log(req.body.sentence);
 	console.log(output);
-	res.writeHead(200, {"Content-Type":"application/json"});
-	var json = JSON.stringify({"sentence": output});
-	res.write(json);
-  	res.end();
+
+	var outputs;
+	options = {args: [output]}
+	pythonShell.run('core.py', options, function(err, results) {
+		if(err)
+			throw new Error(err);
+		console.log(results[0]);
+
+		res.writeHead(200, {"Content-Type":"application/json"});
+  		var json = JSON.stringify({"sentence": results[0]});
+		res.write(json);
+        	res.end();
+	
+	});
+
+
+	//res.writeHead(200, {"Content-Type":"application/json"});
+	//var json = JSON.stringify({"sentence": outputs});
+	//res.write(json);
+  	//res.end();
+
+
 });
 
 
