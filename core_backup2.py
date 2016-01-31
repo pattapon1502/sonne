@@ -133,13 +133,10 @@ def game(text, context):
         return ["เล่นเกมอะไร", "เกม"]
 
     if(len(context) > 1 and context[1] == "เกมเสียงอะไร"):
-        return playgame("เกมเสียงอะไร", text, context)
+        return game001(text, context)
         
     elif(len(context) > 1 and context[1] == "เกมบวกลบเลข"):
-        return playgame("เกมบวกลบเลข", text, context)
-        
-    elif(len(context) > 1 and context[1] == "เกมอะไรต่างจากพวก"):
-        return playgame("เกมอะไรต่างจากพวก", text, context)
+        return game002(text, context)
         
     else:
     
@@ -148,16 +145,14 @@ def game(text, context):
             if(i+2 < len(text) and text[i] == "เกม" and text[i+1] == "เสียง" and text[i+2] == "อะไร"):
                 return ["เล่นเกมเสียงอะไร พร้อมไหม", "เกม เกมเสียงอะไร พร้อมไหม"]
                 
-            elif(i+3 < len(text) and text[i] == "เกม" and text[i+1] == "บวก" and text[i+2] == "ลบ" and text[i+3] == "เลข"):
+            if(i+3 < len(text) and text[i] == "เกม" and text[i+1] == "บวก" and text[i+2] == "ลบ" and text[i+3] == "เลข"):
                 return ["เล่นเกมบวกลบเลข พร้อมไหม", "เกม เกมบวกลบเลข พร้อมไหม"]
     
-            elif(i+4 < len(text) and text[i] == "เกม" and text[i+1] == "อะไร" and text[i+2] == "ต่าง" and text[i+3] == "จาก" and text[i+4] == "พวก"):
-                return ["เล่นเกมอะไรต่างจากพวก พร้อมไหม", "เกม เกมอะไรต่างจากพวก พร้อมไหม"]
+        
     return [" "]
-    
-
-
-def playgame(game, text, context):
+        
+            
+def game001(text, context):
 
     #start
     if(context[2] == "พร้อมไหม" or context[2] == "เล่นอีกไหม"):
@@ -166,15 +161,11 @@ def playgame(game, text, context):
         
             if(text[i] == "พร้อม" or (i+1 < len(text) and text[i] == "เอา" and text[i-1] == "เลย") or text[i] == "เล่น"):
             
-                if(game == "เกมเสียงอะไร"):
-                    ques, ans = game001()
-                elif(game == "เกมบวกลบเลข"):
-                    ques, ans = game002()
-                elif(game == "เกมอะไรต่างจากพวก"):
-                    ques, ans = game003()
-                else:
-                    ques, ans = [" ", " "]
-                return [ques, "เกม " + game + " " + ques + " " + ans]
+                with open('game.json') as data_file:    
+                    data = json.load(data_file)
+
+                ran = random.randrange(1, data[0]['number']+1)
+                return [data[ran]['sound_path'].encode('utf-8'), "เกม เกมเสียงอะไร " + data[ran]['sound_path'].encode('utf-8') + " " + data[ran]['answer'].encode('utf-8')]
                 
         else: # quit
             return ["ไม่เล่นแล้วเหรอ"]
@@ -184,85 +175,93 @@ def playgame(game, text, context):
         for i in range(len(text)):
 
             if(len(context) > 2 and text[i] == context[3]):
-                return ["ถูกต้อง เล่นอีกไหม", "เกม " +game+ " เล่นอีกไหม"]
+                return ["ถูกต้อง เล่นอีกไหม", "เกม เกมเสียงอะไร เล่นอีกไหม"]
                 
             elif(isthere(text, "เปลี่ยน")):
-            
-                if(game == "เกมเสียงอะไร"):
-                    ques, ans = game001()
-                elif(game == "เกมบวกลบเลข"):
-                    ques, ans = game002()
-                elif(game == "เกมอะไรต่างจากพวก"):
-                    ques, ans = game003()
-                else:
-                    ques, ans = [" ", " "]
-                    
-                return [ques, "เกม " + game + " " + ques + " " + ans]
+                with open('game.json') as data_file:    
+                    data = json.load(data_file)
+                ran = random.randrange(1, data[0]['number']+1)
+                return [data[ran]['sound_path'].encode('utf-8'), "เกม เกมเสียงอะไร " + data[ran]['sound_path'].encode('utf-8') + " " + data[ran]['answer'].encode('utf-8')]
                 
-            elif((i+1 < len(text) and text[i] == "ฟัง" and text[i+1] == "ใหม่") or (i+1 < len(text) and text[i] == "ขอ" and text[i+1] == "อีก")):
-                return [context[2], "เกม " + game + " "+ context[2] + " " + context[3]]
+            elif(i+1 < len(text) and text[i] == "ฟัง" and text[i-1] == "ใหม่"):
+                return [context[2], "เกม เกมเสียงอะไร " + context[2] + " " + context[3]]
                 
             elif(text[i] == "ยอมแพ้" or text[i] == "เฉลย"):  
-                return ["คำตอบคือ "+context[3]+ " เล่นอีกไหม", "เกม " + game + " เล่นอีกไหม"]
+                return ["คำตอบคือเสียง "+context[3]+ " เล่นอีกไหม", "เกม เกมเสียงอะไร เล่นอีกไหม"]
                 
             elif(isthere(text, "ไม่")):
                 return ["ไม่เล่นแล้วเหรอ"]
             
             else:
-                return ["ผิด", "เกม " + game + " " + context[2] + " " + context[3]]
+                return ["ผิด", "เกม เกมเสียงอะไร " + context[2] + " " + context[3]]
         
     return [" "]
+    
+def game002(text, context):
+
+    #start
+    if(context[2] == "พร้อมไหม" or context[2] == "เล่นอีกไหม"):
+    
+        for i in range(len(text)):
         
+            if(text[i] == "พร้อม" or (i+1 < len(text) and text[i] == "เอา" and text[i-1] == "เลย") or text[i] == "เล่น"):
+                
+                num1 = random.randrange(1, 10)
+                num2 = random.randrange(1, 10)
+                if(random.randrange(0, 2) == 1):
+                    oper = "+"
+                else:
+                    oper = "-"
+                if(num1 > num2):
+                    ques = str(num1)+oper+str(+num2)
+                    
+                else:
+                    ques = str(num2)+oper+str(num1)
+                print ques
+                ans = str(sympy.sympify(ques))
+                return [ques, "เกม เกมบวกลบเลข " + ques + " " + ans]
+                
+        else: # quit
+            return ["ไม่เล่นแล้วเหรอ"]
+    # answer            
+    else:
+        
+        for i in range(len(text)):
+
+            if(len(context) > 2 and text[i] == context[3]):
+                return ["ถูกต้อง เล่นอีกไหม", "เกม เกมบวกลบเลข เล่นอีกไหม"]
+                
+            elif(isthere(text, "เปลี่ยน")):
+                num1 = random.randrange(1, 10)
+                num2 = random.randrange(1, 10)
+                if(random.randrange(0, 2) == 1):
+                    oper = "+"
+                else:
+                    oper = "-"
+                if(num1 > num2):
+                    ques = str(num1)+" "+oper+" "+str(num2)
+                    
+                else:
+                    ques = str(num2)+" "+oper+" "+str(num1)
+                
+                ans = str(sympy.sympify(ques))
+                return [ques, "เกม เกมบวกลบเลข " + ques + " " + ans]
+                
+            elif((i+1 < len(text) and text[i] == "ฟัง" and text[i+1] == "ใหม่") or (i+1 < len(text) and text[i] == "ขอ" and text[i+1] == "อีก")):
+                return [context[2], "เกม เกมบวกลบเลข " + context[2] + " " + context[3]]
+                
+            elif(text[i] == "ยอมแพ้" or text[i] == "เฉลย"):  
+                return ["คำตอบคือ "+context[3]+ " เล่นอีกไหม", "เกม เกมบวกลบเลข เล่นอีกไหม"]
+                
+            elif(isthere(text, "ไม่")):
+                return ["ไม่เล่นแล้วเหรอ"]
             
-def game001():
-         
-    with open('game/game001.json') as data_file:    
-        data = json.load(data_file)
-
-    ran = random.randrange(1, data[0]['number']+1)
-    return [data[ran]['sound_path'].encode('utf-8'), data[ran]['answer'].encode('utf-8')]
-
-def game002():
-    num1 = random.randrange(1, 10)
-    num2 = random.randrange(1, 10)
-    if(random.randrange(0, 2) == 1):
-        oper = "+"
-    else:
-        oper = "-"
+            else:
+                return ["ผิด", "เกม เกมบวกลบเลข " + context[2] + " " + context[3]]
         
-    if(num1 > num2):
-        ques = str(num1)+oper+str(+num2)
-    else:
-        ques = str(num2)+oper+str(num1)
-    
-    ans = str(sympy.sympify(ques))
-    return [ques, ans]
+    return [" "]
 
-def game003():
 
-    with open('game/game003.json') as data_file:    
-    data = json.load(data_file)
-
-    rantype1 = random.randrange(1, data[0]['number']+1)
-    rantype2 = random.randrange(1, data[0]['number']+1)
-    while(rantype1 == rantype2):
-        rantype2 = random.randrange(1, data[0]['number']+1)
-
-    print rantype1
-    print rantype2
-    print data[1]['number']
-    ranthing1 = random.randrange(0, data[rantype1]['number'])
-    ranthing2 = random.randrange(0, data[rantype1]['number'])
-    while(ranthing1 == ranthing2):
-        ranthing2 = random.randrange(0, data[rantype1]['number'])
-    ranthing3 = random.randrange(0, data[rantype2]['number'])
-
-    x = [data[rantype1]['name'][ranthing1].encode('utf-8'), data[rantype1]['name'][ranthing2].encode('utf-8'), data[rantype2]['name'][ranthing3].encode('utf-8')]
-    random.shuffle(x)
-    ques = x[0] + " " + x[1] + " " + x[2]
-    ans = data[rantype2]['name'][ranthing3].encode('utf-8')
-    
-    return [ques, ans]
 
 if __name__ == "__main__":
 

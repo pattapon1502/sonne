@@ -1,0 +1,7 @@
+[
+    {"number": 3},
+    {"sound_path": "bin/001.wav", "answer":"หมา"},
+    {"sound_path": "bin/002.wav", "answer":"แมว"},
+    {"sound_path": "bin/003.wav", "answer":"นก"}
+
+]
