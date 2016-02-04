@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import sys
-
+'''
 import json, requests
 
 url = 'http://sigma.cpe.kmutt.ac.th:3000/lexto'
@@ -18,8 +18,8 @@ while(True):
     print res.json()['sentence'] + " " + res.json()['context']
     
     context = res.json()['context']
-
 '''
+
 def isthere2(text, data):
 
     for i in range(len(text)):
@@ -41,4 +41,3 @@ if __name__ == "__main__":
     print text
     
     print isthere2(text, test)
-'''

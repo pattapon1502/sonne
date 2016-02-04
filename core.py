@@ -8,13 +8,18 @@ import sympy
 import random
 import json
 
+    
 def isthere(text, word):
 
     for i in range(len(text)):
-        if(text[i] == word):
-            return True;
+        
+        if(i+len(word) <= len(text)):
+            
+            if(text[i:i+len(word)] == word[0:len(word)]):
+                
+                return True
 
-    return False;
+    return False
 
 def date(date):
 
@@ -73,88 +78,65 @@ def getmonth(date, delta):
     else:	
         return "none"
 	
-def calculate(text):
-
-    question = ""
-
-    for i in range(len(text)):
-        if(text[i] ==  "เท่ากับ"):
-            return sympy.sympify(question)
-
-        if(text[i] ==  "บวก" or text[i] == "+"):
-            question = question + "+"
-        elif(text[i] == "ลบ" or text[i] == "-"):
-            question = question + "-" 
-        elif(text[i] == "คูณ" or text[i] == "x"):
-            question = question + "*"
-        elif(text[i] == "หาร" or text[i] == "/"):
-            question = question + "/"
-        elif(text[i] == "ยกกำลัง"):
-            question = question + "**"
-        else:
-            question = question + text[i]
-    #print question
-    return sympy.sympify(question)
-            
-
-def main(text, context):
     
-    for i in range(len(text)):
-        if(i+1 < len(text) and text[i] == "วัน" and text[i+1] == "อะไร"):
+    
+def main(text, context):
 
-            if(isthere(text, "เมื่อวาน")):
-                return [date(datetime.datetime.now() + datetime.timedelta(days=-1))]
-            elif(isthere(text, "พรุ่งนี้")):
-                return [date(datetime.datetime.now() + datetime.timedelta(days=1))]
-            elif(isthere(text, "มะรืน")):
-                return [date(datetime.datetime.now() + datetime.timedelta(days=2))]
-            elif(isthere(text, "เมื่อวานซืน")):
-                return [date(datetime.datetime.now() + datetime.timedelta(days=-2))]
-            else:
-                return [date(datetime.datetime.now())]
-
-        if(i+1 < len(text) and text[i] == "เดือน" and text[i+1] == "อะไร"):
-            if(isthere(text, "หน้า")):
-                return [getmonth(datetime.datetime.now(), 1)]
-            elif(isthere(text, "ที่แล้ว")):
-                return [getmonth(datetime.datetime.now(), -1)]
-            else:
-                return [getmonth(datetime.datetime.now(), 0)]
-                
-                
-        if(i+1 < len(text) and text[i] == "เล่น" and text[i+1] == "เกม" or (text[i] == "เล่น" and len(text) == 1)):
-            return game(text, context)
-
+    if(isthere(text, ["สวัสดี"]) or isthere(text, ["อรุณสวัสดิ์"]) or isthere(text, ["หวัดดี"])):
+        if(datetime.datetime.now().hour > 6 and datetime.datetime.now().hour < 10):
+            return ["สวัสดีตอนเช้า"]
+        elif(datetime.datetime.now().hour >= 12 and datetime.datetime.now().hour < 13):
+            return ["สวัสดีตอนเที่ยง"]
+        elif(datetime.datetime.now().hour >= 13 and datetime.datetime.now().hour < 16):
+            return ["สวัสดีตอนเย็น"]
+        else:
+            return ["สวัสดี"]
+    elif(isthere(text, ["บาย"]) or isthere(text, ["ลาก่อน"]) or isthere(text, ["ราตรีสวัสดิ์"])):
+        if(datetime.datetime.now().hour >= 19):
+            return ["ฝันดี"]
+        else:
+            return ["ลาก่อน"]
+    elif(isthere(text, ["เล่น", "เกม"])):
+        return game(text, context)
+    elif(isthere(text, ["วันนี้", "เป็น", "วัน", "อะไร"]) or isthere(text, ["วันนี้", "วัน", "อะไร"])):
+        return ["วันนี้เป็น" +getweekday(datetime.datetime.now())]
+    elif(isthere(text, ["พรุ่งนี้", "เป็น", "วัน", "อะไร"]) or isthere(text, ["พรุ่งนี้", "วัน", "อะไร"])):
+        return ["พรุ่งนี้เป็น" +getweekday(datetime.datetime.now() + datetime.timedelta(days=1))]
+    elif(isthere(text, ["เมื่อวาน", "เป็น", "วัน", "อะไร"])or isthere(text, ["เมื่อวาน", "วัน", "อะไร"])):
+        return ["เมื่อวานเป็น" +getweekday(datetime.datetime.now() + datetime.timedelta(days=-1))]
+    elif(isthere(text, ["="])):
+        try:
+            return [sympy.sympify("".join(text[0:len(text)-1]))]
+        except:
+            return ["คำถามผิด"]
+    
     return ["ไม่รู้อ่ะ"]
     
 def game(text, context):
 
-    if(context[0] == "none"):
-        return ["เล่นเกมอะไร", "เกม"]
-
     if(len(context) > 1 and context[1] == "เกมเสียงอะไร"):
-        return playgame("เกมเสียงอะไร", text, context)
-        
+        return playgame("เกมเสียงอะไร", text, context)    
     elif(len(context) > 1 and context[1] == "เกมบวกลบเลข"):
-        return playgame("เกมบวกลบเลข", text, context)
-        
+        return playgame("เกมบวกลบเลข", text, context)     
     elif(len(context) > 1 and context[1] == "เกมอะไรต่างจากพวก"):
         return playgame("เกมอะไรต่างจากพวก", text, context)
         
     else:
-    
-        for i in range(len(text)):
-
-            if(i+2 < len(text) and text[i] == "เกม" and text[i+1] == "เสียง" and text[i+2] == "อะไร"):
-                return ["เล่นเกมเสียงอะไร พร้อมไหม", "เกม เกมเสียงอะไร พร้อมไหม"]
-                
-            elif(i+3 < len(text) and text[i] == "เกม" and text[i+1] == "บวก" and text[i+2] == "ลบ" and text[i+3] == "เลข"):
-                return ["เล่นเกมบวกลบเลข พร้อมไหม", "เกม เกมบวกลบเลข พร้อมไหม"]
-    
-            elif(i+4 < len(text) and text[i] == "เกม" and text[i+1] == "อะไร" and text[i+2] == "ต่าง" and text[i+3] == "จาก" and text[i+4] == "พวก"):
-                return ["เล่นเกมอะไรต่างจากพวก พร้อมไหม", "เกม เกมอะไรต่างจากพวก พร้อมไหม"]
+        if(isthere(text, ["เล่น", "เกม", "เสียง", "อะไร"])):
+            return ["เล่นเกมเสียงอะไร พร้อมไหม", "เกม เกมเสียงอะไร พร้อมไหม"]
+        elif(isthere(text, ["เล่น", "เกม", "เสียง", "บวก", "ลบ", "เลข"])):
+            return ["เล่นเกมบวกลบเลข พร้อมไหม", "เกม เกมบวกลบเลข พร้อมไหม"]
+        elif(isthere(text, ["เล่น", "เกม", "อะไร", "ต่าง", "จาก", "พวก"])):
+            return ["เล่นเกมอะไรต่างจากพวก พร้อมไหม", "เกม เกมอะไรต่างจากพวก พร้อมไหม"]
+        elif(isthere(text, ["เล่น", "เกม"])):
+            return ["เล่นเกมอะไร", "เกม"]
+        elif(isthere(text, ["มี", "เกม", "อะไร"])):
+            return ["มี เกมเสียงอะไร เกมบวกลบเลข เกมอะไรจากต่างพวก", "เกม"]
+            
     return [" "]
     
+    
+
 
 
 def playgame(game, text, context):
@@ -186,7 +168,7 @@ def playgame(game, text, context):
             if(len(context) > 2 and text[i] == context[3]):
                 return ["ถูกต้อง เล่นอีกไหม", "เกม " +game+ " เล่นอีกไหม"]
                 
-            elif(isthere(text, "เปลี่ยน")):
+            elif(isthere(text, ["เปลี่ยน"])):
             
                 if(game == "เกมเสียงอะไร"):
                     ques, ans = game001()
@@ -199,21 +181,20 @@ def playgame(game, text, context):
                     
                 return [ques, "เกม " + game + " " + ques + " " + ans]
                 
-            elif((i+1 < len(text) and text[i] == "ฟัง" and text[i+1] == "ใหม่") or (i+1 < len(text) and text[i] == "ขอ" and text[i+1] == "อีก")):
+            elif(isthere(text, ["ฟัง", "ไหม"]) or isthere(text, ["ขอ", "อีก"])):
                 return [context[2], "เกม " + game + " "+ context[2] + " " + context[3]]
                 
             elif(text[i] == "ยอมแพ้" or text[i] == "เฉลย"):  
                 return ["คำตอบคือ "+context[3]+ " เล่นอีกไหม", "เกม " + game + " เล่นอีกไหม"]
                 
-            elif(isthere(text, "ไม่")):
+            elif(isthere(text, ["ไม่"])):
                 return ["ไม่เล่นแล้วเหรอ"]
             
             else:
                 return ["ผิด", "เกม " + game + " " + context[2] + " " + context[3]]
         
     return [" "]
-        
-            
+                    
 def game001():
          
     with open('game/game001.json') as data_file:    
@@ -241,16 +222,13 @@ def game002():
 def game003():
 
     with open('game/game003.json') as data_file:    
-    data = json.load(data_file)
+        data = json.load(data_file)
 
     rantype1 = random.randrange(1, data[0]['number']+1)
     rantype2 = random.randrange(1, data[0]['number']+1)
     while(rantype1 == rantype2):
         rantype2 = random.randrange(1, data[0]['number']+1)
 
-    print rantype1
-    print rantype2
-    print data[1]['number']
     ranthing1 = random.randrange(0, data[rantype1]['number'])
     ranthing2 = random.randrange(0, data[rantype1]['number'])
     while(ranthing1 == ranthing2):
@@ -259,33 +237,32 @@ def game003():
 
     x = [data[rantype1]['name'][ranthing1].encode('utf-8'), data[rantype1]['name'][ranthing2].encode('utf-8'), data[rantype2]['name'][ranthing3].encode('utf-8')]
     random.shuffle(x)
-    ques = x[0] + " " + x[1] + " " + x[2]
+    ques = x[0] + x[1] + x[2]
     ans = data[rantype2]['name'][ranthing3].encode('utf-8')
     
     return [ques, ans]
 
 if __name__ == "__main__":
-
+    
     if(len(sys.argv) < 3):
         sys.exit()
         
     text = sys.argv[1].split()
     context = sys.argv[2].split()
     
-    if(isthere(context, "เกม")):
+
+    if(isthere(context, ["เกม"]) or isthere(text, ["เกม"])):
         output = game(text, context)
     else:
         output = main(text, context)
         
     if(len(output) == 1):
         print output[0]
-        #a = output[0].encode('utf-8')
-        #print a
         print "none"
     else:
         print output[0]
         print output[1]
-    
+
 
 
 

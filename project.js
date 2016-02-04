@@ -15,12 +15,23 @@ var restful = require('node-restful');
 var mongoose = restful.mongoose
 mongoose.connect('mongodb://localhost:27017/boom_test');
 
+var schema = mongoose.model('prototype', {sentence: String, doll_series: String, actor: String});
+
 app.use('/home', function(req, res){
 	
 	
     res.writeHead(200, {"Content-Type":"text/html"});
     res.write("It's working");
     res.end();
+
+});
+
+app.use('/home2', function(req, res) {
+
+    res.writeHead(200, {"Content-Type": "application/json"});
+    var json2 = JSON.stringify({"text": "it's working"});
+    res.write(json2);
+    res.end()
 
 });
 
@@ -38,6 +49,13 @@ app.use('/mongo', function(req, res) {
 app.post('/lexto', function(req, res) {
 
     //{"sentence":"", "mode":"", "doll series":"", }
+    var database = new schema({sentence: req.body.sentence, doll_series: req.body.doll_series, actor: "kid"});
+    database.save(function (err) {
+        if(err) {
+            console.log('there is error');
+        }
+    });
+
     var output = lexto.word_segmentationSync(req.body.sentence);	
     console.log(req.body.sentence);
     console.log(req.body.context);
@@ -52,12 +70,23 @@ app.post('/lexto', function(req, res) {
         console.log(results[1]);
 
         res.writeHead(200, {"Content-Type":"application/json"});
-        var json = JSON.stringify({"sentence": results[0], "context":results[1], "doll series": "prototype001"});
+        var json = JSON.stringify({"sentence": results[0], "context": results[1], "doll_series": req.body.doll_series});
         console.log(results);
         res.write(json);
         res.end();
 
+        var database2 = new schema({sentence: results[0], doll_series: req.body.doll_series, actor: "doll"});
+        database2.save(function (err) {
+            if(err) {
+                console.log('there is error');
+            }
+        });
+
+
     });
+    
+
+
 });
 
 
