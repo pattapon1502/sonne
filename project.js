@@ -35,6 +35,24 @@ app.use('/home2', function(req, res) {
 
 });
 
+app.get('/getdata', function(req, res) {
+
+    schema.find({actor: "kid", sentence: "สวัสดี"}, function (err, docs) {
+        res.json(docs);
+    });
+
+
+});
+
+app.get('/data/:user', function(req, res) {
+
+    schema.find({actor: "kid", doll_series: req.params.user}, function (err, docs) {
+        res.json(docs);
+    });
+
+
+});
+
 app.use('/mongo', function(req, res) {
 
     var resources = app.test = restful.model('test', mongoose.Schema({
@@ -47,6 +65,21 @@ app.use('/mongo', function(req, res) {
 });
 
 app.post('/lexto', function(req, res) {
+
+    var output = lexto.word_segmentationSync(req.body.sentence);
+    console.log(req.body.sentence);
+    console.log(output);
+
+    
+    res.writeHead(200, {"Content-Type":"application/json"});
+    var json = JSON.stringify({"sentence": output});
+    
+    res.write(json);
+    res.end();
+
+});
+
+app.post('/project', function(req, res) {
 
     //{"sentence":"", "mode":"", "doll series":"", }
     var database = new schema({sentence: req.body.sentence, doll_series: req.body.doll_series, actor: "kid"});
@@ -70,12 +103,12 @@ app.post('/lexto', function(req, res) {
         console.log(results[1]);
 
         res.writeHead(200, {"Content-Type":"application/json"});
-        var json = JSON.stringify({"sentence": results[0], "context": results[1], "doll_series": req.body.doll_series});
+        var json = JSON.stringify({"sentence": results[0], "context": results[1], "doll_series": req.body.doll_series, "action": results[2], "sound": results[3]});
         console.log(results);
         res.write(json);
         res.end();
 
-        var database2 = new schema({sentence: results[0], doll_series: req.body.doll_series, actor: "doll"});
+        var database2 = new schema({sentence: results[0], doll_series: req.body.doll_series, actor: "doll", action: results[2], sound: results[3]});
         database2.save(function (err) {
             if(err) {
                 console.log('there is error');

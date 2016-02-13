@@ -1,0 +1,11 @@
+[
+{"name": "default", "command": "1"},
+{"name": "both_raise", "command": "2"},
+{"name": "left_raise", "command": "3"},
+{"name": "right_raise", "command": "4"},
+{"name": "fly", "command": "5"},
+{"name": "right_wave", "command": "6"},
+{"name": "extendarm", "command": "7"},
+{"name": "exercise", "command": "8"}
+]
+
