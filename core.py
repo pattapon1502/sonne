@@ -144,9 +144,9 @@ def main(text, context):
         return ["สวัสดี"]
     elif(isthere(text, ["บ๊ายบาย"]) or isthere(text, ["ลาก่อน"]) or isthere(text, ["ราตรีสวัสดิ์"]) or isthere(text, ["bye"])):
         if(datetime.datetime.now().hour >= 19):
-            return ["ฝันดี"]
+            return ["ฝันดี", "none", "right_wave"]
         else:
-            return ["ลาก่อน"]
+            return ["บ๊ายบาย", "none", "right_wave"]
     elif(isthere(text, ["เล่น", "เกม"])):
         return game(text, context)
     elif(isthere(text, ["เล่านิทาน"]) or isthere(text, ["ฟัง", "นิทาน"])):
@@ -185,31 +185,33 @@ def main(text, context):
                 return ["คำถามผิด"]
     # action       
     elif(isthere(text, ["ยก", "ปีกขวา"]) or isthere(text, ["ยก", "แขนขวา"]) or isthere(text, ["ยกมือ", "ขวา"])):
-        return [''.join(text[:]), "none", "right_raise"]
+        return ["none", "none", "right_raise"]
     elif(isthere(text, ["ยก", "ปีกซ้าย"]) or isthere(text, ["ยก", "แขน", "ซ้าย"]) or isthere(text, ["ยกมือ", "ซ้าย"])):
-        return [''.join(text[:]), "none", "left_raise"]
+        return ["none", "none", "left_raise"]
     elif(isthere(text, ["ยกมือ"]) or isthere(text, ["ชูมือ"])):
-        return [''.join(text[:]), "none", "both_raise"]
+        return ["none", "none", "both_raise"]
         
     elif(isthere(text, ["ยกมือ", "ลง"]) or isthere(text, ["เอา", "มือ", "ลง"])):
-        return [''.join(text[:]), "none", "default"]
+        return ["none", "none", "default"]
         
     elif(isthere(text, ["โบกมือ", "ขวา"]) or isthere(text, ["โบก", "แขนขวา"])):
-        return [''.join(text[:]), "none", "right_wave"]
+        return ["none", "none", "right_wave"]
     elif(isthere(text, ["โบกมือ", "ซ้าย"]) or isthere(text, ["โบก", "แขน", "ซ้าย"])):
-        return [''.join(text[:]), "none", "left_wave"]
+        return ["none", "none", "left_wave"]
     elif(isthere(text, ["โบกมือ"]) or isthere(text, ["สะบัด", "มือ"])):
-        return [''.join(text[:]), "none", "both_wave"]   
+        return ["none", "none", "both_wave"]   
         
     elif(isthere(text, ["กางแขน"])):
-        return [''.join(text[:]), "none", "extendarm"]
+        return ["none", "none", "extendarm"]
     elif(isthere(text, ["บิน"]) or isthere(text, ["กระพือปีก"])):
-        return [''.join(text[:]), "none", "fly"]
+        return ["none", "none", "fly"]
     elif(isthere(text, ["ออกกำลังกาย"])):
-        return [''.join(text[:]), "none", "exercise"]
+        return ["none", "none", "exercise"]
     
     
-    return ["ไม่รู้อ่ะ"]
+    if(isthere(text, ["ทำไม"]) or isthere(text, ["อะไร"]) or isthere(text, ["เมื่อไร"])):
+        return ["ไม่รู้อ่ะ"]
+    
     
 def game(text, context):
 
@@ -221,11 +223,11 @@ def game(text, context):
         return playgame("เกมอะไรต่างจากพวก", text, context)
         
     else:
-        if(isthere(text, ["เล่น", "เกม", "เสียง", "อะไร"])):
+        if(isthere(text, ["เกม", "เสียง", "อะไร"])):
             return ["เล่น เกมเสียงอะไร พร้อมไหม", "เกม,เกมเสียงอะไร,พร้อมไหม"]
-        elif(isthere(text, ["เล่น", "เกม", "บวก", "ลบ", "เลข"])):
+        elif(isthere(text, ["เกม", "บวก", "ลบ", "เลข"])):
             return ["เล่น เกมบวกลบเลข พร้อมไหม", "เกม,เกมบวกลบเลข,พร้อมไหม"]
-        elif(isthere(text, ["เล่น", "เกม", "อะไร", "ต่าง", "จาก", "พวก"])):
+        elif(isthere(text, ["เกม", "อะไร", "ต่าง", "จาก", "พวก"])):
             return ["เล่น เกมอะไรต่างจากพวก พร้อมไหม", "เกม,เกมอะไรต่างจากพวก,พร้อมไหม"]
         elif(isthere(text, ["เล่น", "เกม"])):
             return ["เล่นเกมอะไร", "เกม"]
@@ -243,7 +245,7 @@ def playgame(game, text, context):
         for i in range(len(text)):
             if(isthere(text, ["ไม่", "เล่น"])):
                 return ["ไม่เล่นแล้วเหรอ"]
-            elif(text[i] == "พร้อม" or (i+1 < len(text) and text[i] == "เอา" and text[i-1] == "เลย") or text[i] == "เล่น"):
+            elif(text[i] == "หอม" or text[i] == "พร้อม" or (i+1 < len(text) and text[i] == "เอา" and text[i-1] == "เลย") or text[i] == "เล่น"):
             
                 if(game == "เกมเสียงอะไร"):
                     ques, ans = game001()
@@ -314,31 +316,7 @@ def game002():
         ques = str(num2)+" "+oper+" "+str(num1)
     
     ans = str(sympy.sympify(ques))
-    return [ques, ans]
-
-def game004():
-
-    with open('json/game003.json') as data_file:    
-        data = json.load(data_file)
-
-    
-
-    rantype1 = random.randrange(1, data[0]['number']+1)
-    rantype2 = random.randrange(1, data[0]['number']+1)
-    while(rantype1 == rantype2):
-        rantype2 = random.randrange(1, data[0]['number']+1)
-
-    ranthing1 = random.randrange(0, data[rantype1]['number'])
-    ranthing2 = random.randrange(0, data[rantype1]['number'])
-    while(ranthing1 == ranthing2):
-        ranthing2 = random.randrange(0, data[rantype1]['number'])
-    ranthing3 = random.randrange(0, data[rantype2]['number'])
-
-    x = [data[rantype1]['name'][ranthing1].encode('utf-8'), data[rantype1]['name'][ranthing2].encode('utf-8'), data[rantype2]['name'][ranthing3].encode('utf-8')]
-    random.shuffle(x)
-    ques = x[0] + " " + x[1] + " " + x[2]
-    ans = data[rantype2]['name'][ranthing3].encode('utf-8')
-    
+    ques = ques + " เท่ากับเท่าไร"
     return [ques, ans]
 
 def game003():
@@ -381,15 +359,16 @@ if __name__ == "__main__":
     sound_output = ""
 
     # output sound file
-    with open('json/sound.json') as sound_file:
-        sound = json.load(sound_file)
+    if(output[0] != "none"):
+        with open('json/sound.json') as sound_file:
+            sound = json.load(sound_file)
 
-    word = output[0].split()
+        word = output[0].split()
 
-    for i in range(len(word)):
-        for j in range(len(sound)):
-            if(word[i] == sound[j]['text'].encode('utf-8')):
-                sound_output = sound_output + sound[j]['file'] + " "
+        for i in range(len(word)):
+            for j in range(len(sound)):
+                if(word[i] == sound[j]['text'].encode('utf-8')):
+                    sound_output = sound_output + sound[j]['file'] + " "
 
 
     # output action order

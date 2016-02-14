@@ -15,7 +15,7 @@ var restful = require('node-restful');
 var mongoose = restful.mongoose
 mongoose.connect('mongodb://localhost:27017/boom_test');
 
-var schema = mongoose.model('prototype', {sentence: String, doll_series: String, actor: String});
+var schema = mongoose.model('prototype', {sentence: String, doll_series: String, actor: String, date: { type: Date, default: Date.now }});
 
 app.use('/home', function(req, res){
 	
@@ -55,13 +55,16 @@ app.get('/data/:user', function(req, res) {
 
 app.use('/mongo', function(req, res) {
 
-    var resources = app.test = restful.model('test', mongoose.Schema({
-        title: String,
-        year: Number
-
-    }))
-    .methods(['get', 'post']);
-    resources.register(app, '/test');
+    var database = new schema({sentence: req.body.sentence, doll_series: req.body.doll_series, actor: "kid"});
+    database.save(function (err) {
+        if(err) {
+            console.log('there is error');
+        }
+    });
+    
+    res.writeHead(200, {"Content-Type": "application/json"});
+    res.write(JSON.stringify({"text": "success"}));
+    res.end()
 });
 
 app.post('/lexto', function(req, res) {

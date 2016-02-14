@@ -20,12 +20,3 @@ while(True):
     
     context = res.json()['context']
 
-while(True):
-
-    input = raw_input()
-    for i in range(len(action)):
-    
-        if(input == action[i]):
-        
-            print i
-    

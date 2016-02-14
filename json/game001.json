@@ -1,8 +1,8 @@
 [
 
-    {"sound_path": "sound/game001/bird.wav", "answer":"สุนัข"},
+    {"sound_path": "sound/game001/dog.wav", "answer":"สุนัข"},
     {"sound_path": "sound/game001/cat.wav", "answer":"แมว"},
-    {"sound_path": "sound/game001/dog.wav", "answer":"นก"},
+    {"sound_path": "sound/game001/bird.wav", "answer":"นก"},
     {"sound_path": "sound/game001/sheep.wav", "answer": "แกะ"}
 
 ]
